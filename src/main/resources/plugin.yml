@@ -1,19 +1,16 @@
 name: Market
-main: com.chromaclypse.market.Market
+main: com.chromaclypse.market.MarketMain
 version: ${project.version}
 description: Virtual trade via shifting prices
 author: ezeiger92
 api-version: 1.13
-depend: [ChromaLib]
+depend: [ChromaLib, ChestShop]
 commands:
   market:
     description: Root Market command
     usage: /<command> [args ...]
     permission: market.create
 permissions:
-  market.use:
-    description: Interact with markets
-    default: true
   market.create:
     description: Create markets
     default: op

@@ -32,7 +32,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.13-R0.1-SNAPSHOT</version>
+			<version>1.13.1-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -40,6 +40,13 @@
 			<artifactId>ChromaclypseApi</artifactId>
 			<version>1.1.0</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.acrobot.chestshop</groupId>
+			<artifactId>chestshop</artifactId>
+			<version>3.8.13</version>
+			<scope>system</scope>
+			<systemPath>C:/Users/Erik/Projects/ShadeCrest/libs/ChestShop.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
