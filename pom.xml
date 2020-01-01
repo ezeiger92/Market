@@ -46,7 +46,7 @@
 			<artifactId>chestshop</artifactId>
 			<version>3.8.13</version>
 			<scope>system</scope>
-			<systemPath>C:/Users/Erik/Projects/ShadeCrest/libs/ChestShop.jar</systemPath>
+			<systemPath>M:/Projects/ShadeCrest/libs/ChestShop.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
