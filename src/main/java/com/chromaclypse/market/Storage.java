@@ -13,6 +13,7 @@ public class Storage extends ConfigObject {
 	
 	public static class Register {
 		public String world = "";
+		public int capacity = 2;
 		public int x = 0;
 		public int y = 0;
 		public int z = 0;

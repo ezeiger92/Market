@@ -1,7 +1,10 @@
 package com.chromaclypse.market;
 
 public class Checkout {
-	public int value = 0;
-	public int salesToPlayer = 0;
-	public int purchasesFromPlayer = 0;
+	public Checkout(int capacity) {
+		this.capacity = capacity;
+		remaining = capacity / 2;
+	}
+	public int remaining;
+	public final int capacity;
 }
