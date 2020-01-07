@@ -136,8 +136,8 @@ public class Market {
 		return val;
 	}
 	
-	public void updatePrice(Location location, Checkout checkout) {
-		float percentFilled = checkout.remaining / (float)checkout.capacity;
+	public void updatePrice(Location location, ShopData checkout) {
+		float percentFilled = checkout.stock / (float)checkout.capacity;
 		float deviation = Math.abs(percentFilled * 2 - 1);
 		
 		if(deviation < .5f)
@@ -151,11 +151,11 @@ public class Market {
 			
 			double scale = 1.1;
 			
-			if(checkout.remaining * 2 > checkout.capacity) {
+			if(checkout.stock * 2 > checkout.capacity) {
 				scale = 1 / scale;
 			}
 			
-			checkout.remaining = checkout.capacity / 2;
+			checkout.stock = checkout.capacity / 2;
 			
 			val.applyScale(scale);
 			
