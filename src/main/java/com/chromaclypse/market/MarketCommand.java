@@ -18,7 +18,7 @@ public class MarketCommand {
 		int stock = context.GetArg(1, Integer::parseInt, "shop stock (int)");
 		
 		Block target = player.getTargetBlock(null, 8);
-		handle.createCheckout(target.getLocation(), stock);
+		handle.createCheckout(target, stock);
 		return true;
 	}
 	
@@ -26,21 +26,16 @@ public class MarketCommand {
 		Player player = context.Player();
 		
 		Block target = player.getTargetBlock(null, 8);
-		handle.removeCheckout(target.getLocation());
+		handle.removeCheckout(target);
 		return true;
 	}
 	
 	public boolean info(Context context) {
 		Player player = context.Player();
 		Block target = player.getTargetBlock(null, 8);
-		Checkout found = handle.getCheckout(target.getLocation());
+		ShopData found = handle.getCheckout(target);
 		
-		if(found != null) {
-			player.sendMessage("Checkout capacity: " + found.remaining + " / " + found.capacity); 
-		}
-		else {
-			player.sendMessage("Not a checkout");
-		}
+		player.sendMessage("Checkout stock: " + found.stock + " / " + found.capacity);
 		return true;
 	}
 	

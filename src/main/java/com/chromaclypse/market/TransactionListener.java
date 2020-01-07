@@ -19,7 +19,7 @@ public class TransactionListener implements Listener {
 	
 	@EventHandler
 	public void onTransaction(PreTransactionEvent transaction) {
-		Checkout checkout = handle.getCheckout(transaction.getSign().getLocation());
+		ShopData checkout = handle.getCheckout(transaction.getSign().getBlock());
 		
 		if(checkout == null)
 			return;
@@ -30,12 +30,12 @@ public class TransactionListener implements Listener {
 		}
 		
 		if(transaction.getTransactionType() == TransactionType.BUY) {
-			if(checkout.remaining - amount < 0) {
+			if(checkout.stock - amount < 0) {
 				transaction.setCancelled(TransactionOutcome.NOT_ENOUGH_STOCK_IN_CHEST);
 			}
 		}
 		else {
-			if(checkout.remaining + amount > checkout.capacity) {
+			if(checkout.stock + amount > checkout.capacity) {
 				transaction.setCancelled(TransactionOutcome.NOT_ENOUGH_SPACE_IN_CHEST);
 			}
 		}
@@ -43,7 +43,7 @@ public class TransactionListener implements Listener {
 	
 	@EventHandler
 	public void onTransaction(TransactionEvent transaction) {
-		Checkout checkout = handle.getCheckout(transaction.getSign().getLocation());
+		ShopData checkout = handle.getCheckout(transaction.getSign().getBlock());
 		
 		if(checkout == null)
 			return;
@@ -54,10 +54,10 @@ public class TransactionListener implements Listener {
 		}
 		
 		if(transaction.getTransactionType() == TransactionType.BUY) {
-			checkout.remaining -= amount;
+			checkout.stock -= amount;
 		}
 		else {
-			checkout.remaining += amount;
+			checkout.stock += amount;
 		}
 	}
 }
