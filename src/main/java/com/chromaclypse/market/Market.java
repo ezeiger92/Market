@@ -7,7 +7,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
-import org.bukkit.block.data.BlockData;
 import org.bukkit.plugin.Plugin;
 
 public class Market {
@@ -25,15 +24,25 @@ public class Market {
 	}
 	
 	public ShopData getCheckout(Block location) {
-		BlockData data = location.getBlockData();
+		BlockState state = location.getState();
 		
-		if(data instanceof Sign) {
-			Sign s = (Sign) data;
+		if(state instanceof Sign) {
+			Sign s = (Sign) state;
 			
 			ShopData shop = s.getPersistentDataContainer().get(MARKET_DATA, marketSerializer);
 			if(shop != null) {
 				return shop;
 			}
+		}
+		
+		return null;
+	}
+	
+	public ShopData unsafeGetCheckout(Block location) {
+		ShopData shop = getCheckout(location);
+		
+		if(shop != null) {
+			return shop;
 		}
 		
 		throw new IllegalArgumentException("No market at block");
@@ -42,10 +51,10 @@ public class Market {
 	
 	
 	public void removeCheckout(Block location) {
-		BlockData data = location.getBlockData();
+		BlockState state = location.getState();
 		
-		if(data instanceof Sign) {
-			Sign s = (Sign) data;
+		if(state instanceof Sign) {
+			Sign s = (Sign) state;
 			
 			if(s.getPersistentDataContainer().has(MARKET_DATA, marketSerializer)) {
 				s.getPersistentDataContainer().remove(MARKET_DATA);
@@ -58,27 +67,32 @@ public class Market {
 	}
 	
 	public void createCheckout(Block location, int stock) {
-		BlockData data = location.getBlockData();
+		BlockState state = location.getState();
 		
-		if(data instanceof Sign) {
-			Sign s = (Sign) data;
+		if(state instanceof Sign) {
+			Sign s = (Sign) state;
 			
 			if(!s.getPersistentDataContainer().has(MARKET_DATA, marketSerializer)) {
 				ShopValue value = getShopValue(s);
 				ShopData shop = new ShopData();
 				shop.capacity = stock * 2;
-				shop.stock = stock * 2;
+				shop.stock = stock;
 				shop.initialBuy = (float) value.buy;
 				shop.initialSell = (float) value.sell;
 				
 				s.getPersistentDataContainer().set(MARKET_DATA, marketSerializer, shop);
 				s.update();
+				return;
 			}
 			
 			throw new IllegalArgumentException("A market already exists here!");
 		}
 		
 		throw new IllegalArgumentException("That is not a sign!");
+	}
+	
+	private static int hundreds(double val) {
+		return (int)Math.round(val * 100);
 	}
 	
 	private static class ShopValue {
@@ -89,7 +103,7 @@ public class Market {
 			int parts = buy > 0 && sell > 0 ? 2 : 1;
 			double total = buy + sell;
 			
-			double diff = Math.round(total / parts * (scale - 1) * 100) / 100.0;
+			double diff = hundreds(total / parts * (scale - 1)) / 100.0;
 			double newBuy = buy;
 			double newSell = sell;
 			
@@ -158,8 +172,44 @@ public class Market {
 			checkout.stock = checkout.capacity / 2;
 			
 			val.applyScale(scale);
+
+			int buy = hundreds(val.buy);
+			int sell = hundreds(val.sell);
 			
-			sign.setLine(2, "B " + val.buy + " : S " + val.sell);
+			
+			int b1 = buy / 100;
+			int b2 = buy % 100;
+			int s1 = sell / 100;
+			int s2 = sell % 100;
+			
+			String buyline = "";
+			
+			if(buy > 0) {
+				buyline += "B " + b1;
+				
+				if(b2 > 0) {
+					buyline += "." + b2 / 10;
+					if(b2 % 10 > 0) {
+						buyline += b2 % 10;
+					}
+				}
+				if(sell > 0) {
+					buyline += " : ";
+				}
+			}
+			
+			if(sell > 0) {
+				buyline += "S " + s1;
+				
+				if(s2 > 0) {
+					buyline += "." + s2 / 10;
+					if(s2 % 10 > 0) {
+						buyline += s2 % 10;
+					}
+				}
+			}
+			
+			sign.setLine(2, buyline);
 			
 			sign.update();
 		}

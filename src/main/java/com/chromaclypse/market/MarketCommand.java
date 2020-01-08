@@ -33,7 +33,7 @@ public class MarketCommand {
 	public boolean info(Context context) {
 		Player player = context.Player();
 		Block target = player.getTargetBlock(null, 8);
-		ShopData found = handle.getCheckout(target);
+		ShopData found = handle.unsafeGetCheckout(target);
 		
 		player.sendMessage("Checkout stock: " + found.stock + " / " + found.capacity);
 		return true;
