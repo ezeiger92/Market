@@ -2,7 +2,6 @@ package com.chromaclypse.market;
 
 import java.nio.ByteBuffer;
 
-import org.bukkit.Location;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -12,19 +11,6 @@ public class ShopData {
 	public int capacity;
 	public int stock;
 	
-	private int task = 0;
-	
-	public void touch(Market market, Location location) {
-		if(task > 0) {
-			market.getPlugin().getServer().getScheduler().cancelTask(task);
-		}
-		
-		task = market.getPlugin().getServer().getScheduler().scheduleSyncDelayedTask(market.getPlugin(), () -> {
-			market.updatePrice(location, this);
-			task = 0;
-		}, 5 * 20);
-	}
-
 	public static class Serializer implements PersistentDataType<byte[], ShopData> {
 
 		@Override

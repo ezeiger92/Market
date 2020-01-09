@@ -19,6 +19,7 @@ public class MarketCommand {
 		
 		Block target = player.getTargetBlock(null, 8);
 		handle.createCheckout(target, stock);
+		player.sendMessage("Created market");
 		return true;
 	}
 	
@@ -27,6 +28,7 @@ public class MarketCommand {
 		
 		Block target = player.getTargetBlock(null, 8);
 		handle.removeCheckout(target);
+		player.sendMessage("Removed market");
 		return true;
 	}
 	
@@ -35,13 +37,14 @@ public class MarketCommand {
 		Block target = player.getTargetBlock(null, 8);
 		ShopData found = handle.unsafeGetCheckout(target);
 		
-		player.sendMessage("Checkout stock: " + found.stock + " / " + found.capacity);
+		player.sendMessage("Market stock: " + found.stock + " / " + found.capacity);
 		return true;
 	}
 	
 	public boolean reload(Context context) {
 		handle.getPlugin().onDisable();
 		handle.getPlugin().onEnable();
+		context.Sender().sendMessage("reload");
 		return true;
 	}
 }

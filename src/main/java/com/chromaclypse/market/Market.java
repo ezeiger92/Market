@@ -1,5 +1,6 @@
 package com.chromaclypse.market;
 
+import java.util.HashMap;
 import java.util.Locale;
 
 import org.bukkit.Location;
@@ -47,8 +48,6 @@ public class Market {
 		
 		throw new IllegalArgumentException("No market at block");
 	}
-	
-	
 	
 	public void removeCheckout(Block location) {
 		BlockState state = location.getState();
@@ -150,68 +149,87 @@ public class Market {
 		return val;
 	}
 	
-	public void updatePrice(Location location, ShopData checkout) {
+	private HashMap<Location, Integer> tasks = new HashMap<>();
+	
+	public void updated(Location location, ShopData checkout) {
+		BlockState state = location.getBlock().getState();
+		
+		Integer task = tasks.get(location);
+		if(task != null) {
+			handle.getServer().getScheduler().cancelTask(task);
+		}
+		
+		if(state instanceof Sign) {
+			tasks.put(location, handle.getServer().getScheduler().scheduleSyncDelayedTask(handle, () -> {
+				if(state instanceof Sign) {
+					updatePrice((Sign)state, checkout);
+				}
+				tasks.remove(location);
+			}, 2 * 60 * 20));
+			
+			((Sign)state).getPersistentDataContainer().set(MARKET_DATA, marketSerializer, checkout);
+			((Sign)state).update();
+		}
+	}
+	
+	private void updatePrice(Sign sign, ShopData checkout) {
 		float percentFilled = checkout.stock / (float)checkout.capacity;
 		float deviation = Math.abs(percentFilled * 2 - 1);
 		
 		if(deviation < .5f)
 			return;
+	
+		ShopValue val = getShopValue(sign);
 		
-		BlockState state = location.getBlock().getState();
+		double scale = 1.1;
 		
-		if(state instanceof Sign) {
-			Sign sign = (Sign)state;
-			ShopValue val = getShopValue(sign);
-			
-			double scale = 1.1;
-			
-			if(checkout.stock * 2 > checkout.capacity) {
-				scale = 1 / scale;
-			}
-			
-			checkout.stock = checkout.capacity / 2;
-			
-			val.applyScale(scale);
-
-			int buy = hundreds(val.buy);
-			int sell = hundreds(val.sell);
-			
-			
-			int b1 = buy / 100;
-			int b2 = buy % 100;
-			int s1 = sell / 100;
-			int s2 = sell % 100;
-			
-			String buyline = "";
-			
-			if(buy > 0) {
-				buyline += "B " + b1;
-				
-				if(b2 > 0) {
-					buyline += "." + b2 / 10;
-					if(b2 % 10 > 0) {
-						buyline += b2 % 10;
-					}
-				}
-				if(sell > 0) {
-					buyline += " : ";
-				}
-			}
-			
-			if(sell > 0) {
-				buyline += "S " + s1;
-				
-				if(s2 > 0) {
-					buyline += "." + s2 / 10;
-					if(s2 % 10 > 0) {
-						buyline += s2 % 10;
-					}
-				}
-			}
-			
-			sign.setLine(2, buyline);
-			
-			sign.update();
+		if(checkout.stock * 2 > checkout.capacity) {
+			scale = 1 / scale;
 		}
+		
+		checkout.stock = checkout.capacity / 2;
+		
+		val.applyScale(scale);
+
+		int buy = hundreds(val.buy);
+		int sell = hundreds(val.sell);
+		
+		
+		int b1 = buy / 100;
+		int b2 = buy % 100;
+		int s1 = sell / 100;
+		int s2 = sell % 100;
+		
+		String buyline = "";
+		
+		if(buy > 0) {
+			buyline += "B " + b1;
+			
+			if(b2 > 0) {
+				buyline += "." + b2 / 10;
+				if(b2 % 10 > 0) {
+					buyline += b2 % 10;
+				}
+			}
+			if(sell > 0) {
+				buyline += " : ";
+			}
+		}
+		
+		if(sell > 0) {
+			buyline += "S " + s1;
+			
+			if(s2 > 0) {
+				buyline += "." + s2 / 10;
+				if(s2 % 10 > 0) {
+					buyline += s2 % 10;
+				}
+			}
+		}
+		
+		sign.setLine(2, buyline);
+		
+		sign.getPersistentDataContainer().set(MARKET_DATA, marketSerializer, checkout);
+		sign.update();
 	}
 }
